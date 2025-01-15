@@ -1,0 +1,14 @@
+.swagger-ui .opblock .opblock-summary-operation-id {
+  font-size: 14px;
+  font-weight: bold;
+  color: #555;
+  font-family: monospace;
+  padding: 0 10px;
+  word-break: keep-all;
+}
+
+.swagger-ui .opblock .opblock-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
