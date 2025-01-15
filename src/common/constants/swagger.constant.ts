@@ -1,7 +1,7 @@
 export const SWAGGER_API_TAG = {
-  HEALTH: {
-    name: 'Health',
-    description: '서버 상태 체크 API',
+  COMMON: {
+    name: 'Common',
+    description: '공통 API',
     order: 1, // 가장 먼저 보이도록
   },
   AUTH: {

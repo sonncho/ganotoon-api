@@ -11,7 +11,7 @@ async function bootstrap() {
 
   // API 프리픽스
   app.setGlobalPrefix('api/', {
-    exclude: ['/health', '/'], // health 엔드포인트는 프리픽스 제외
+    exclude: ['/', 'common/'], // health 엔드포인트는 프리픽스 제외
   });
 
   // API URI 버저닝

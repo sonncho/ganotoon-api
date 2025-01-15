@@ -4,8 +4,9 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import databaseConfig from './config/database.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { HealthModule } from './common/health/health.module';
 import { UsersModule } from './modules/users/users.module';
+import { AuthController } from './modules/auth/auth.controller';
+import { CommonModule } from './modules/common/common.module';
 
 @Module({
   imports: [
@@ -21,10 +22,10 @@ import { UsersModule } from './modules/users/users.module';
         ...configService.get('database'),
       }),
     }),
-    HealthModule,
+    CommonModule,
     UsersModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, AuthController],
   providers: [AppService],
 })
 export class AppModule {}
