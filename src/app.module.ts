@@ -2,18 +2,19 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import databaseConfig from './config/database.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './modules/users/users.module';
-import { AuthController } from './modules/auth/auth.controller';
 import { CommonModule } from './modules/common/common.module';
+import { AuthModule } from './modules/auth/auth.module';
+
+import * as configs from './configs';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: [`.env.${process.env.NODE_ENV}`],
-      load: [databaseConfig],
+      load: Object.values(configs),
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -24,8 +25,9 @@ import { CommonModule } from './modules/common/common.module';
     }),
     CommonModule,
     UsersModule,
+    AuthModule,
   ],
-  controllers: [AppController, AuthController],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}

@@ -1,16 +1,21 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { validationConfig } from './config/validation.config';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
-import { setupSwagger } from './config/swagger.config';
+
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+import { ConfigService } from '@nestjs/config';
+import { setupSwagger } from './configs/setup';
+import { GlobalExceptionFilter } from './common/filters';
+import { TransformInterceptor } from './common/interceptors';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  const configService = app.get(ConfigService);
+
   // API 프리픽스
-  app.setGlobalPrefix('api/', {
+  app.setGlobalPrefix(`${configService.get('app.apiPrefix')}/`, {
     exclude: ['/', 'common/'], // health 엔드포인트는 프리픽스 제외
   });
 
@@ -33,13 +38,14 @@ async function bootstrap() {
     credentials: true,
   });
 
-  app.useGlobalPipes(new ValidationPipe(validationConfig));
+  app.useGlobalPipes(new ValidationPipe(configService.get('validation')));
+  app.useGlobalFilters(new GlobalExceptionFilter());
+  app.useGlobalInterceptors(new TransformInterceptor());
 
   // Swagger 설정
   setupSwagger(app);
 
-  const port = process.env.PORT || 3000;
-  await app.listen(port);
+  await app.listen(configService.get('app.port'));
 
   console.log(`Application is running on: ${await app.getUrl()}`);
   console.log(`Swagger documentation: ${await app.getUrl()}/api-docs`);

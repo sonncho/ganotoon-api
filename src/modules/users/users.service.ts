@@ -1,9 +1,11 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities';
 import { CreateUserDto } from './dtos/create-user.dto';
 import * as bcrypt from 'bcrypt';
+import { BusinessException } from '@/common/exceptions';
+import { ErrorCode } from '@/common/constants';
 
 @Injectable()
 export class UsersService {
@@ -14,21 +16,15 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     // 이메일 중복 체크
-    const existingUser = await this.usersRepository.findOne({
-      where: { email: createUserDto.email },
-    });
-
+    const existingUser = await this.findByEmail(createUserDto.email);
     if (existingUser) {
-      throw new ConflictException('이미 사용중인 이메일입니다');
+      throw new BusinessException(ErrorCode.USER.EMAIL_DUPLICATE);
     }
 
     // 닉네임 중복 체크
-    const existingNickname = await this.usersRepository.findOne({
-      where: { nickname: createUserDto.nickname },
-    });
-
+    const existingNickname = await this.findByNickname(createUserDto.nickname);
     if (existingNickname) {
-      throw new ConflictException('이미 사용중인 닉네임입니다');
+      throw new BusinessException(ErrorCode.USER.NICKNAME_DUPLICATE);
     }
 
     // 비밀번호 해시화
@@ -41,5 +37,25 @@ export class UsersService {
     });
 
     return this.usersRepository.save(user);
+  }
+
+  async findByEmail(email: string): Promise<User | undefined> {
+    return this.usersRepository.findOne({ where: { email } });
+  }
+
+  async findByNickname(nickname: string): Promise<User | undefined> {
+    return this.usersRepository.findOne({ where: { nickname } });
+  }
+
+  async findById(id: number): Promise<User | undefined> {
+    return this.usersRepository.findOne({ where: { id } });
+  }
+
+  async update(
+    id: number,
+    updateData: Partial<User>,
+  ): Promise<User | undefined> {
+    await this.usersRepository.update(id, updateData);
+    return this.findById(id);
   }
 }
