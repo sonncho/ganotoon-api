@@ -7,6 +7,7 @@ import { BusinessException } from '@/common/exceptions';
 import { ErrorCode } from '@/common/constants';
 import * as bcrypt from 'bcrypt';
 import { Tokens } from './types/tokens.type';
+import { TokenBlacklistService } from './services/token-blacklist.service';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +15,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private tokenBlacklistService: TokenBlacklistService,
   ) {}
 
   async login(loginDto: LoginDto) {
@@ -43,8 +45,14 @@ export class AuthService {
     };
   }
 
-  async logout(userId: number) {
-    await this.usersService.update(userId, { refreshToken: null });
+  async logout(userId: number, accessToken: string): Promise<void> {
+    await this.usersService.update(userId, {
+      refreshToken: null,
+      refreshTokenExpiresAt: null,
+      lastLoginAt: new Date(),
+    });
+
+    await this.tokenBlacklistService.addToBlacklist(accessToken);
   }
 
   async refreshTokens(userId: number, refreshToken: string) {

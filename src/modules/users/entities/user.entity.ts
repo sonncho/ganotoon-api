@@ -39,6 +39,14 @@ export class User extends BaseEntity {
   gender: Gender;
 
   @Column({
+    type: 'boolean',
+    name: 'is_email_verified',
+    default: false,
+    comment: '이메일 인증 완료 여부',
+  })
+  isEmailVerified: boolean;
+
+  @Column({
     name: 'birth_date',
     type: 'date',
     comment: '생년월일',

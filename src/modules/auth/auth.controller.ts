@@ -1,12 +1,21 @@
 import { SWAGGER_API_TAG } from '@/common/constants/swagger.constant';
-import { Body, Controller, Post, Res, Version } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+  Version,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from './dtos';
 import { AuthService } from './auth.service';
 import { ApiDocs } from '@/common/decorators';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { parseDuration } from '@/common/utils/duration.util';
+import { AccessTokenGuard } from './guards/access-token.guard';
 
 @Controller('auth')
 @ApiTags(SWAGGER_API_TAG.AUTH.name)
@@ -45,5 +54,30 @@ export class AuthController {
     const { refreshToken, ...result } = loginResponse;
 
     return result;
+  }
+
+  @Post('logout')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '로그아웃' })
+  @Version('1')
+  async logout(
+    @Req() req: Request,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const userId = req.user['sub'];
+    const accessToken = req.headers['authorization']?.replace('Bearer ', '');
+
+    await this.authService.logout(userId, accessToken);
+
+    // refresh token 쿠키 제거
+    response.cookie('refresh_token', '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 0,
+      path: '/auth/refresh',
+    });
+
+    return null;
   }
 }

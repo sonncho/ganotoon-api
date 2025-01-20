@@ -30,5 +30,9 @@ export const ErrorCode = {
       code: 'COMMON_VALIDATION_ERROR',
       message: '입력값이 올바르지 않습니다.',
     },
+    INVALID_CODE: {
+      code: 'COMMON_INVALID_CODE',
+      message: '유효한 인증코드가 아닙니다.',
+    },
   },
 } as const;
