@@ -20,6 +20,10 @@ export const ErrorCode = {
       code: 'USER_ACCESS_DENIED',
       message: '접근이 거부됬습니다',
     },
+    EMAIL_NOT_VERIFIED: {
+      code: 'USER_EMAIL_NOT_VERIFIED',
+      message: '이메일 인증이 필요합니다.',
+    },
   },
   COMMON: {
     INTERNAL_ERROR: {
@@ -33,6 +37,14 @@ export const ErrorCode = {
     INVALID_CODE: {
       code: 'COMMON_INVALID_CODE',
       message: '유효한 인증코드가 아닙니다.',
+    },
+    DAILY_LIMIT_EXCEEDED: {
+      code: 'COMMON_DAILY_LIMIT_EXCEEDED',
+      message: '일일 최대 전송 횟수를 초과했습니다. 내일 다시 시도해주세요.',
+    },
+    EMAIL_SEND_FAILED: {
+      code: 'COMMON_EMAIL_SEND_FAILED',
+      message: '이메일 발송에 실패했습니다.',
     },
   },
 } as const;

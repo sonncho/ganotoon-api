@@ -28,9 +28,12 @@ export class AuthService {
     );
     if (!passwordMatches) throw new BusinessException(ErrorCode.USER.INVALID);
 
-    await this.usersService.update(user.id, {
-      lastLoginAt: new Date(),
-    });
+    await this.usersService.update(
+      { id: user.id },
+      {
+        lastLoginAt: new Date(),
+      },
+    );
 
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
@@ -46,11 +49,14 @@ export class AuthService {
   }
 
   async logout(userId: number, accessToken: string): Promise<void> {
-    await this.usersService.update(userId, {
-      refreshToken: null,
-      refreshTokenExpiresAt: null,
-      lastLoginAt: new Date(),
-    });
+    await this.usersService.update(
+      { id: userId },
+      {
+        refreshToken: null,
+        refreshTokenExpiresAt: null,
+        lastLoginAt: new Date(),
+      },
+    );
 
     await this.tokenBlacklistService.addToBlacklist(accessToken);
   }
@@ -106,8 +112,11 @@ export class AuthService {
 
   async updateRefreshToken(userId: number, refreshToken: string) {
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-    await this.usersService.update(userId, {
-      refreshToken: hashedRefreshToken,
-    });
+    await this.usersService.update(
+      { id: userId },
+      {
+        refreshToken: hashedRefreshToken,
+      },
+    );
   }
 }

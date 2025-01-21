@@ -1,0 +1,40 @@
+<html>
+  <head>
+    <meta charset='utf-8' />
+    <title>[GANOTOON] 이메일 인증</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; } body { font-family:
+      'Arial', sans-serif; line-height: 1.6; background-color: #f5f6fa; }
+      .container { max-width: 600px; margin: 40px auto; padding: 40px 20px;
+      background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px
+      rgba(0,0,0,0.1); } .logo { text-align: center; margin-bottom: 30px; }
+      .logo-text { color: #2D3436; font-size: 28px; font-weight: bold;
+      letter-spacing: 2px; } .title { color: #2D3436; text-align: center;
+      font-size: 24px; margin-bottom: 20px; } .description { font-size: 16px;
+      color: #636E72; text-align: center; margin-bottom: 30px; } .code-container
+      { background-color: #F1F2F6; padding: 30px; margin: 20px 0; text-align:
+      center; border-radius: 8px; } .code { color: #0984E3; font-size: 36px;
+      letter-spacing: 8px; font-weight: bold; } .footer { color: #B2BEC3;
+      text-align: center; font-size: 14px; margin-top: 30px; padding-top: 20px;
+      border-top: 1px solid #DFE6E9; } .footer p { margin: 5px 0; } .notice {
+      color: #636E72; font-size: 13px; margin-top: 15px; }
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='logo'>
+        <div class='logo-text'>GANOTOON</div>
+      </div>
+      <h1 class='title'>이메일 인증</h1>
+      <p class='description'>아래의 인증 코드를 입력해주세요</p>
+      <div class='code-container'>
+        <h2 class='code'>{{code}}</h2>
+      </div>
+      <div class='footer'>
+        <p>이 인증 코드는 5분간 유효합니다</p>
+        <p class='notice'>본 메일은 발신전용으로 회신이 불가합니다</p>
+        <p>© 2024 GANOTOON. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+</html>

@@ -7,10 +7,6 @@ export const authConfig = registerAs('auth', () => ({
     accessExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN || '15m',
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
   },
-  email: {
-    user: process.env.EMAIL_USER,
-    password: process.env.EMAIL_PASSWORD,
-  },
   // oauth: {
   //   google: {
   //     clientId: process.env.GOOGLE_CLIENT_ID,

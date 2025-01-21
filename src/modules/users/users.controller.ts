@@ -14,12 +14,12 @@ export class UsersController {
   @Post()
   @ApiDocs({
     summary: '일반 회원가입',
-    description: '새로운 사용자를 생성합니다',
+    description: '이메일을 인증을 선행해야 회원가입이 가능합니다',
     successType: CreateUserDto,
     errorCodes: [
       'USER.EMAIL_DUPLICATE',
       'USER.NICKNAME_DUPLICATE',
-      'COMMON.INTERNAL_ERROR',
+      'USER.EMAIL_NOT_VERIFIED',
     ],
   })
   async create(@Body() createUserDto: CreateUserDto) {

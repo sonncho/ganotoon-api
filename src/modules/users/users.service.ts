@@ -6,15 +6,24 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { BusinessException } from '@/common/exceptions';
 import { ErrorCode } from '@/common/constants';
+import { VerificationService } from '../auth/services/verification.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+    private readonly verificationService: VerificationService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
+    // 이메일 인증 여부 체크
+    const isVerified = await this.verificationService.isEmailVerified(
+      createUserDto.email,
+    );
+    if (!isVerified)
+      throw new BusinessException(ErrorCode.USER.EMAIL_NOT_VERIFIED);
+
     // 이메일 중복 체크
     const existingUser = await this.findByEmail(createUserDto.email);
     if (existingUser) {
@@ -52,10 +61,17 @@ export class UsersService {
   }
 
   async update(
-    id: number,
+    condition: Partial<Pick<User, 'id' | 'email'>>,
     updateData: Partial<User>,
-  ): Promise<User | undefined> {
-    await this.usersRepository.update(id, updateData);
-    return this.findById(id);
+  ): Promise<User> {
+    if ('id' in condition) {
+      await this.usersRepository.update(condition.id, updateData);
+      return this.findById(condition.id);
+    } else if ('email' in condition) {
+      await this.usersRepository.update({ email: condition.email }, updateData);
+      return this.findByEmail(condition.email);
+    }
+
+    throw new Error('Invalid update condition');
   }
 }
