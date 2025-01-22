@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 import { BusinessException } from '@/common/exceptions';
 import { ErrorCode } from '@/common/constants';
 import { VerificationService } from '../auth/services/verification.service';
+import { MailService } from '../common/mail/mail.service';
 
 @Injectable()
 export class UsersService {
@@ -14,6 +15,7 @@ export class UsersService {
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
     private readonly verificationService: VerificationService,
+    private readonly mailService: MailService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -44,6 +46,11 @@ export class UsersService {
       ...createUserDto,
       password: hashedPassword,
     });
+
+    await this.mailService.sendWelcomeEmail(
+      createUserDto.email,
+      createUserDto.nickname,
+    );
 
     return this.usersRepository.save(user);
   }

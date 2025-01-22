@@ -7,7 +7,7 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class VerificationService {
   private readonly DAILY_LIMIT = 5; // 하루 최대 전송 횟수
-  private readonly VERIFIED_EMAIL_PREFIX = 'verified_email:';
+  private readonly VERIFIED_EMAIL_PREFIX = 'verified_email';
 
   constructor(
     private redisService: RedisService,
