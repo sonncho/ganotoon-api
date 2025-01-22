@@ -31,6 +31,7 @@ export class UsersController {
       'USER.EMAIL_DUPLICATE',
       'USER.NICKNAME_DUPLICATE',
       'USER.EMAIL_NOT_VERIFIED',
+      'COMMON.EMAIL_SEND_FAILED',
     ],
   })
   async create(@Body() createUserDto: CreateUserDto) {
