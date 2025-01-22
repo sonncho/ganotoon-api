@@ -134,7 +134,14 @@ export class AuthController {
   @Post('refresh')
   @Version('1')
   @UseGuards(AccessTokenGuard)
-  @ApiOperation({ summary: '토큰 갱신' })
+  @ApiOperation({
+    summary: '토큰 갱신',
+    description:
+      'cookie에 담긴 refresh_token으로 새로운 accessToken을 발급합니다',
+  })
+  @ApiResponse({
+    status: 200,
+  })
   async refresh(@Req() req: Request) {
     const user = req.user;
     const refreshToken = req.cookies['refresh_token'];

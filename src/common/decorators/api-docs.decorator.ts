@@ -5,17 +5,15 @@ import { ErrorCode } from '../constants';
 interface ApiDocsOptions {
   summary: string; // API 요약 설명
   description?: string; // API 상세 설명 (optional)
-  successType?: any; // 성공 응답의 타입 (DTO 클래스)
+  response?: any; // 성공 응답의 타입 (DTO 클래스)
   errorCodes?: string[]; // 발생 가능한 에러 코드 목록
 }
 
 export function ApiDocs(options: ApiDocsOptions) {
-  const { summary, description, successType, errorCodes = [] } = options;
+  const { summary, description, response, errorCodes = [] } = options;
 
   // successType의 example 데이터 생성
-  const successExampleData = successType
-    ? Reflect.construct(successType, [])
-    : {};
+  const successExampleData = response ? Reflect.construct(response, []) : {};
 
   const errorExamples = errorCodes.reduce((acc, errorCode) => {
     const [domain, code] = errorCode.split('.');
@@ -49,8 +47,8 @@ export function ApiDocs(options: ApiDocsOptions) {
                 type: 'object',
                 properties: {
                   success: { type: 'boolean' },
-                  data: successType
-                    ? { $ref: `#/components/schemas/${successType.name}` }
+                  data: response
+                    ? { $ref: `#/components/schemas/${response.name}` }
                     : { type: 'object' },
                   error: { type: 'null' },
                 },

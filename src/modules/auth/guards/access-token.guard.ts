@@ -12,6 +12,7 @@ export class AccessTokenGuard extends AuthGuard('jwt') {
     super();
   }
 
+  // 토큰 유효성 검증
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isValid = await super.canActivate(context);
     if (!isValid) {
@@ -19,8 +20,18 @@ export class AccessTokenGuard extends AuthGuard('jwt') {
     }
 
     const request = context.switchToHttp().getRequest();
-    const token = request.headers.authorization?.replace('Bearer ', '');
+    const authHeader = request.headers.authorization;
 
+    if (!authHeader)
+      throw new UnauthorizedException('Authorization header is missing');
+
+    // Bearer 토큰 형식 체크
+    const [type, token] = authHeader.split(' ');
+    if (type !== 'Bearer' || !token) {
+      throw new UnauthorizedException('Invalid token format');
+    }
+
+    // 블랙리스트 체크
     if (await this.tokenBlacklistService.isBlacklisted(token)) {
       throw new UnauthorizedException('Token has been revoked');
     }

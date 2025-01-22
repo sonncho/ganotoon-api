@@ -57,7 +57,12 @@ export class UsersService {
   }
 
   async findById(id: number): Promise<User | undefined> {
-    return this.usersRepository.findOne({ where: { id } });
+    const user = await this.usersRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new BusinessException(ErrorCode.USER.NOT_FOUND);
+    }
+
+    return user;
   }
 
   async update(

@@ -22,6 +22,6 @@ import { VerificationService } from './services/verification.service';
     TokenBlacklistService,
     VerificationService,
   ],
-  exports: [AuthService, VerificationService],
+  exports: [AuthService, VerificationService, TokenBlacklistService],
 })
 export class AuthModule {}

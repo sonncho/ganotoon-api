@@ -1,4 +1,4 @@
-export interface ApiResponse<T> {
+export interface ApiResponseWrapper<T> {
   success: boolean;
   data: T | null;
   error?: {
