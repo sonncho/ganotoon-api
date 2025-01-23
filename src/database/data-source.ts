@@ -26,3 +26,7 @@ const dataSourceOptions: DataSourceOptions = {
 const dataSource = new DataSource(dataSourceOptions);
 
 export default dataSource;
+
+//* migration 예시
+// npm run migration:create:dev --name=AddPostTypeSeeds
+// npm run migration:run:dev
