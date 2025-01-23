@@ -2,6 +2,8 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { BaseEntity } from '@/common/entities/base.entity';
 import { UserRole, Gender } from '../constants/user.constant';
 import { SocialAccount } from './social-account.entity';
+import { Post } from '@/modules/posts/entities/post.entity';
+import { PostComment } from '@/modules/posts/entities/post-comment.entity';
 
 @Entity('users')
 export class User extends BaseEntity {
@@ -105,4 +107,12 @@ export class User extends BaseEntity {
 
   @OneToMany(() => SocialAccount, (socialAccount) => socialAccount.user)
   socialAccounts: SocialAccount[];
+
+  // 게시글 관계 추가
+  @OneToMany(() => Post, (post) => post.author)
+  posts: Post[];
+
+  // 댓글 관계 추가
+  @OneToMany(() => PostComment, (comment) => comment.author)
+  postComments: PostComment[];
 }

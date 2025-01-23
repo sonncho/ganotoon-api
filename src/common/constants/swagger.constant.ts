@@ -14,24 +14,29 @@ export const SWAGGER_API_TAG = {
     description: '사용자 관리 API',
     order: 3,
   },
+  POSTS: {
+    name: 'Posts',
+    description: '게시판(공지사항,FAQ,QNA,자유게시판) 관리 API',
+    order: 4,
+  },
   WEBTOONS: {
     name: 'Webtoons',
     description: '웹툰 관리 API',
-    order: 4,
+    order: 5,
   },
   EPISODES: {
     name: 'Episodes',
     description: '에피소드 관리 API',
-    order: 5,
+    order: 6,
   },
   COMMENTS: {
     name: 'Comments',
     description: '댓글 관리 API',
-    order: 6,
+    order: 7,
   },
   LIKES: {
     name: 'Likes',
     description: '좋아요 관리 API',
-    order: 7,
+    order: 8,
   },
 } as const;
