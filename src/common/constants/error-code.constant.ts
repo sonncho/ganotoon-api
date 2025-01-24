@@ -1,4 +1,22 @@
 export const ErrorCode = {
+  AUTH: {
+    UNAUTHORIZED: {
+      code: 'AUTH_UNAUTHORIZED',
+      message: '인증이 필요합니다.',
+    },
+    INVALID_TOKEN: {
+      code: 'AUTH_INVALID_TOKEN',
+      message: '유효하지 않은 토큰입니다.',
+    },
+    TOKEN_EXPIRED: {
+      code: 'AUTH_TOKEN_EXPIRED',
+      message: '만료된 토큰입니다.',
+    },
+    TOKEN_BLACKLISTED: {
+      code: 'AUTH_TOKEN_BLACKLISTED',
+      message: '폐기된 토큰입니다.',
+    },
+  },
   USER: {
     NOT_FOUND: {
       code: 'USER_NOT_FOUND',
@@ -45,6 +63,16 @@ export const ErrorCode = {
     EMAIL_SEND_FAILED: {
       code: 'COMMON_EMAIL_SEND_FAILED',
       message: '이메일 발송에 실패했습니다.',
+    },
+  },
+  POST: {
+    TYPE_NOT_FOUND: {
+      code: 'POST_TYPE_NOT_FOUND',
+      message: '존재하지 않는 게시판 유형입니다.',
+    },
+    NO_WRITE_PERMISSION: {
+      code: 'POST_NO_WRITE_PERMISSION',
+      message: '해당 게시판에 글을 작성할 권한이 없습니다.',
     },
   },
 } as const;

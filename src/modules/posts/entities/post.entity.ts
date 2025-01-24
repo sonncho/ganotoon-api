@@ -61,6 +61,7 @@ export class Post extends BaseEntityWithDelete {
 
   @Column({
     name: 'author_id',
+    nullable: false,
     comment: '작성자 ID',
   })
   authorId: number;

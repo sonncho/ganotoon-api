@@ -8,6 +8,7 @@ import { CommonModule } from './modules/common/common.module';
 import { AuthModule } from './modules/auth/auth.module';
 
 import * as configs from './configs';
+import { PostsModule } from './modules/posts/posts.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import * as configs from './configs';
     CommonModule,
     AuthModule,
     UsersModule,
+    PostsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

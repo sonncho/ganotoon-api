@@ -1,20 +1,13 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Version,
-  Get,
-  UseGuards,
-} from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Controller, Post, Body, Version, Get } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { SWAGGER_API_TAG } from '@/common/constants/swagger.constant';
 import { ApiDocs } from '@/common/decorators';
-import { AccessTokenGuard } from '../auth/guards/access-token.guard';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { User } from './entities';
 import { UserResponseDto } from './dtos/user-response.dto';
+import { MemberOnly } from '../auth/decorators/member-only.decorator';
 
 @Controller('users')
 @ApiTags(SWAGGER_API_TAG.USERS.name)
@@ -45,8 +38,7 @@ export class UsersController {
 
   @Version('1')
   @Get('me')
-  @UseGuards(AccessTokenGuard)
-  @ApiBearerAuth()
+  @MemberOnly()
   @ApiDocs({
     summary: '내 정보 조회',
     // response: UserResponseDto,

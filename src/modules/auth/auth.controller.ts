@@ -1,27 +1,14 @@
 import { SWAGGER_API_TAG } from '@/common/constants/swagger.constant';
-import {
-  Body,
-  Controller,
-  Post,
-  Req,
-  Res,
-  UseGuards,
-  Version,
-} from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { Body, Controller, Post, Req, Res, Version } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto, SendVerificationDto, VerifyEmailDto } from './dtos';
 import { AuthService } from './auth.service';
 import { ApiDocs } from '@/common/decorators';
 import { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { parseDuration } from '@/common/utils/duration.util';
-import { AccessTokenGuard } from './guards/access-token.guard';
 import { VerificationService } from './services/verification.service';
+import { MemberOnly } from './decorators/member-only.decorator';
 
 @Controller('auth')
 @ApiTags(SWAGGER_API_TAG.AUTH.name)
@@ -64,8 +51,7 @@ export class AuthController {
   }
 
   @Post('logout')
-  @UseGuards(AccessTokenGuard)
-  @ApiBearerAuth()
+  @MemberOnly()
   @ApiDocs({
     summary: '로그아웃',
     description: '로그아웃시 Header에 accessToken이 필요합니다',
@@ -133,7 +119,7 @@ export class AuthController {
 
   @Post('refresh')
   @Version('1')
-  @UseGuards(AccessTokenGuard)
+  @MemberOnly()
   @ApiOperation({
     summary: '토큰 갱신',
     description:
