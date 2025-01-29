@@ -1,5 +1,5 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiExtraModels, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ErrorCode } from '../constants';
 
 interface ApiDocsOptions {
@@ -12,33 +12,15 @@ interface ApiDocsOptions {
 export function ApiDocs(options: ApiDocsOptions) {
   const { summary, description, response, errorCodes = [] } = options;
 
-  // successType의 example 데이터 생성
-  const successExampleData = response ? Reflect.construct(response, []) : {};
-
-  const errorExamples = errorCodes.reduce((acc, errorCode) => {
-    const [domain, code] = errorCode.split('.');
-    const error = ErrorCode[domain][code];
-
-    acc[error.code] = {
-      summary: error.code,
-      value: {
-        success: false,
-        data: null,
-        error: {
-          code: error.code,
-          message: error.message,
-        },
-      },
-    };
-
-    return acc;
-  }, {});
+  // 성공 응답의 예제 데이터 생성
+  const successExampleData = response?.example?.() || {};
 
   return applyDecorators(
+    ...(response ? [ApiExtraModels(response)] : []),
     ApiOperation({ summary, description }),
     ApiResponse({
       status: 200,
-      description: '성공 또는 비즈니스 에러',
+      description: '성공 및 비즈니스 에러',
       content: {
         'application/json': {
           schema: {
@@ -48,7 +30,9 @@ export function ApiDocs(options: ApiDocsOptions) {
                 properties: {
                   success: { type: 'boolean' },
                   data: response
-                    ? { $ref: `#/components/schemas/${response.name}` }
+                    ? {
+                        $ref: `#/components/schemas/${response.name}`,
+                      }
                     : { type: 'object' },
                   error: { type: 'null' },
                 },
@@ -70,15 +54,33 @@ export function ApiDocs(options: ApiDocsOptions) {
             ],
           },
           examples: {
-            success: {
-              summary: 'Success',
+            '정상 응답': {
+              summary: '정상 응답',
+              description: 'API 호출 성공',
               value: {
                 success: true,
                 data: successExampleData,
                 error: null,
               },
             },
-            ...errorExamples,
+            ...errorCodes.reduce((acc, errorCode) => {
+              const [domain, code] = errorCode.split('.');
+              const error = ErrorCode[domain][code];
+
+              acc[`비즈니스 에러: ${error.code}`] = {
+                summary: `비즈니스 에러: ${error.code}`,
+                description: error.message,
+                value: {
+                  success: false,
+                  data: null,
+                  error: {
+                    code: error.code,
+                    message: error.message,
+                  },
+                },
+              };
+              return acc;
+            }, {}),
           },
         },
       },

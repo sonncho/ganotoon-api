@@ -5,9 +5,11 @@ import { Repository } from 'typeorm';
 import { PostType } from './entities/post-type.entity';
 import { CreatePostRequestDto, PostResponseDto } from './dtos/post.dto';
 import { BusinessException } from '@/common/exceptions';
-import { ErrorCode } from '@/common/constants';
+import { ErrorCode, SortOrder } from '@/common/constants';
 import { UsersService } from '../users/users.service';
 import { JwtPayload } from '../auth/types/tokens.type';
+import { FindPostsRequestDto, PostSortBy } from './dtos/find-posts.dto';
+import { PaginatedResponseDto } from '@/common/dtos';
 
 @Injectable()
 export class PostsService {
@@ -53,4 +55,84 @@ export class PostsService {
     const savedPost = await this.postRepository.save(post);
     return PostResponseDto.from(savedPost);
   }
+
+  //* 단일 게시글 조회
+  async findById(id: number, user?: JwtPayload) {
+    //게시글 조회
+    const post = await this.postRepository.findOne({
+      where: { id, isActive: true },
+      relations: ['author', 'postType', 'postComments'],
+    });
+
+    if (!post) throw new BusinessException(ErrorCode.POST.NOT_FOUND);
+
+    //조회수 증가
+    await this.postRepository.increment({ id }, 'viewCount', 1);
+    return PostResponseDto.from(post, user?.sub);
+  }
+
+  //* 게시글 전체 조회
+  async findAll(params: FindPostsRequestDto, user?: JwtPayload) {
+    const queryBuilder = this.postRepository
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.author', 'author')
+      .leftJoinAndSelect('post.postType', 'postType')
+      .leftJoin(
+        'post.postComments',
+        'postComment',
+        'postComment.isActive = :isActive',
+        {
+          isActive: true,
+        },
+      )
+      .addSelect('COUNT(DISTINCT postComment.id)', 'commentCount')
+      .where('post.isActive = :isActive', { isActive: true })
+      .groupBy('post.id')
+      .addGroupBy('author.id')
+      .addGroupBy('postType.id');
+
+    // 게시물 타입 필터링
+    if (params.type) {
+      queryBuilder.andWhere('postType.type = :type', { type: params.type });
+    }
+
+    // 검색어 필터링
+    if (params.keyword) {
+      queryBuilder.andWhere('post.title LIKE :keyword', {
+        keyword: `%${params.keyword}%`,
+      });
+    }
+
+    // 졍렬 적용
+    if (params.sortBy === PostSortBy.COMMENTS) {
+      queryBuilder.orderBy('commentCount', params.sortOrder || SortOrder.DESC);
+    } else {
+      const sortField = `post.${params.sortBy || 'createdAt'}`;
+      queryBuilder.orderBy(sortField, params.sortOrder || SortOrder.DESC);
+    }
+
+    const [posts, total] = await queryBuilder
+      .skip(params.skip)
+      .take(params.limit)
+      .getManyAndCount();
+
+    return PaginatedResponseDto.from(
+      posts.map((post) => PostResponseDto.from(post, user?.sub)),
+      total,
+      params.page,
+      params.limit,
+    );
+  }
+
+  //* 게시글 댓글 조회
+  // findCommnetByPostId(postId: number) {
+  //   // 게시글 존재 여부 확인
+  //   // 댓글조회
+  // }
+
+  //* 게시글 댓글 생성
+
+  //* 게시글 댓글 삭제
+
+  //* 게시글 댓글 수정
 }

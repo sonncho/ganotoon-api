@@ -31,6 +31,14 @@ export class PostComment extends BaseEntityWithDelete {
   })
   postId: number;
 
+  @Column({
+    name: 'is_active',
+    type: 'boolean',
+    default: true,
+    comment: '활성화 여부',
+  })
+  isActive: boolean;
+
   @ManyToOne(() => User, (user) => user.postComments)
   @JoinColumn({ name: 'author_id' })
   author: User;

@@ -70,6 +70,12 @@ export class PostResponseDto {
   @ApiProperty({ example: 0 })
   viewCount: number;
 
+  @ApiProperty({ example: 0 })
+  commentCount: number;
+
+  @ApiProperty({ example: false })
+  isOwner: boolean;
+
   @ApiProperty()
   createdAt: Date;
 
@@ -82,12 +88,14 @@ export class PostResponseDto {
   @ApiProperty()
   author: AuthorResponseDto;
 
-  static from(post: Post): PostResponseDto {
+  static from(post: Post, userId?: number): PostResponseDto {
     return {
       id: post.id,
       title: post.title,
       content: post.content,
       viewCount: post.viewCount,
+      commentCount: post.postComments?.length || 0,
+      isOwner: userId ? post.authorId === userId : false, // 소유 여부 체크
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
       postType: {

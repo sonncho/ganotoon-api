@@ -7,7 +7,7 @@ import { ApiDocs } from '@/common/decorators';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { User } from './entities';
 import { UserResponseDto } from './dtos/user-response.dto';
-import { MemberOnly } from '../auth/decorators/member-only.decorator';
+import { Auth } from '../auth/decorators/auth.decorator';
 
 @Controller('users')
 @ApiTags(SWAGGER_API_TAG.USERS.name)
@@ -38,7 +38,7 @@ export class UsersController {
 
   @Version('1')
   @Get('me')
-  @MemberOnly()
+  @Auth()
   @ApiDocs({
     summary: '내 정보 조회',
     // response: UserResponseDto,

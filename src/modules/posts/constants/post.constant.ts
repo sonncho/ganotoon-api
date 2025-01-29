@@ -12,3 +12,9 @@ export const POST_TYPE_PERMISSIONS = {
   [PostTypeEnum.FAQ]: ['ADMIN'], // FAQ: 관리자만
   [PostTypeEnum.FREE]: ['ADMIN', 'USER'], // 자유게시판: 모든 사용자
 } as const;
+
+// 게시글 정렬 기준
+export enum PostSortFieldEnum {
+  CREATED_AT = 'createdAt',
+  VIEW_COUNT = 'viewCount',
+}

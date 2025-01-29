@@ -66,6 +66,10 @@ export const ErrorCode = {
     },
   },
   POST: {
+    NOT_FOUND: {
+      code: 'POST_NOT_FOUND',
+      message: '게시글을 찾을 수 없습니다.',
+    },
     TYPE_NOT_FOUND: {
       code: 'POST_TYPE_NOT_FOUND',
       message: '존재하지 않는 게시판 유형입니다.',

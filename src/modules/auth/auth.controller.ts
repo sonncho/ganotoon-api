@@ -8,7 +8,7 @@ import { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { parseDuration } from '@/common/utils/duration.util';
 import { VerificationService } from './services/verification.service';
-import { MemberOnly } from './decorators/member-only.decorator';
+import { Auth } from './decorators/auth.decorator';
 
 @Controller('auth')
 @ApiTags(SWAGGER_API_TAG.AUTH.name)
@@ -51,7 +51,7 @@ export class AuthController {
   }
 
   @Post('logout')
-  @MemberOnly()
+  @Auth()
   @ApiDocs({
     summary: '로그아웃',
     description: '로그아웃시 Header에 accessToken이 필요합니다',
@@ -119,7 +119,7 @@ export class AuthController {
 
   @Post('refresh')
   @Version('1')
-  @MemberOnly()
+  @Auth()
   @ApiOperation({
     summary: '토큰 갱신',
     description:
