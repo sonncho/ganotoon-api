@@ -8,7 +8,7 @@ import { CommonModule } from './modules/common/common.module';
 import { AuthModule } from './modules/auth/auth.module';
 
 import * as configs from './configs';
-import { PostsModule } from './modules/posts/posts.module';
+import { PostsModule } from './modules/posts';
 
 @Module({
   imports: [
@@ -24,7 +24,10 @@ import { PostsModule } from './modules/posts/posts.module';
         ...configService.get('database'),
       }),
     }),
+    // 공통 모듈
     CommonModule,
+
+    // 기능 모듈들
     AuthModule,
     UsersModule,
     PostsModule,

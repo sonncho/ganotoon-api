@@ -8,18 +8,18 @@ import {
   Query,
   Version,
 } from '@nestjs/common';
-import { ApiBody, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 
-import { PostsService } from './posts.service';
+import { PostsService } from '../services/posts.service';
 import { ApiDocs } from '@/common/decorators';
-import { CreatePostRequestDto, PostResponseDto } from './dtos/post.dto';
-import { GetUser } from '../auth/decorators/get-user.decorator';
+import { CreatePostRequestDto, PostResponseDto } from '../dtos/post.dto';
+import { GetUser } from '../../auth/decorators/get-user.decorator';
 import { SWAGGER_API_TAG } from '@/common/constants';
-import { JwtPayload } from '../auth/types/tokens.type';
-import { FindPostsRequestDto } from './dtos/find-posts.dto';
+import { JwtPayload } from '../../auth/types/tokens.type';
+import { FindPostsRequestDto } from '../dtos/find-posts.dto';
 import { PaginatedResponseDto } from '@/common/dtos';
 
-import { Auth } from '../auth/decorators/auth.decorator';
+import { Auth } from '../../auth/decorators/auth.decorator';
 
 @Controller('posts')
 @ApiTags(SWAGGER_API_TAG.POSTS.name)
@@ -59,7 +59,6 @@ export class PostsController {
     errorCodes: ['POST.NOT_FOUND'],
     response: PostResponseDto,
   })
-  @ApiOkResponse({})
   async findById(
     @Param('id', ParseIntPipe) id: number,
     @GetUser() user?: JwtPayload,
@@ -70,6 +69,7 @@ export class PostsController {
 
   @Get()
   @Version('1')
+  // @Render('posts/list')
   @Auth({ isOptional: true })
   @ApiDocs({
     summary: '게시글 목록 조회',

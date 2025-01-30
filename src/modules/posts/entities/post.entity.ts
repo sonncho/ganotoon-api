@@ -68,4 +68,21 @@ export class Post extends BaseEntityWithDelete {
 
   @OneToMany(() => PostComment, (comment) => comment.post)
   postComments: PostComment[];
+
+  @Column({
+    name: 'comment_count',
+    type: 'int',
+    default: 0,
+    comment: '댓글 수',
+  })
+  commentCount: number;
+
+  // 활성화된 댓글 수만 별도로 관리하는 것도 고려해볼 수 있습니다
+  @Column({
+    name: 'active_comment_count',
+    type: 'int',
+    default: 0,
+    comment: '활성화된 댓글 수',
+  })
+  activeCommentCount: number;
 }

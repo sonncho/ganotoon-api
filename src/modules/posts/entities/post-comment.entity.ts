@@ -9,6 +9,8 @@ import {
 } from 'typeorm';
 import { Post } from './post.entity';
 import { User } from '@/modules/users/entities';
+import { PostCommentLike } from './post-comment-like.entity';
+import { PostCommentReport } from './post-comment-report.entity';
 
 @Entity('post_comments')
 export class PostComment extends BaseEntityWithDelete {
@@ -64,4 +66,28 @@ export class PostComment extends BaseEntityWithDelete {
 
   @OneToMany(() => PostComment, (comment) => comment.parent)
   children: PostComment[];
+
+  @OneToMany(() => PostCommentLike, (like) => like.comment)
+  likes: PostCommentLike[];
+
+  @OneToMany(() => PostCommentReport, (report) => report.comment)
+  reports: PostCommentReport[];
+
+  // 좋아요 수를 저장하는 필드 (성능 최적화를 위해)
+  @Column({
+    name: 'like_count',
+    type: 'int',
+    default: 0,
+    comment: '좋아요 수',
+  })
+  likeCount: number;
+
+  // 신고 수를 저장하는 필드 (성능 최적화를 위해)
+  @Column({
+    name: 'report_count',
+    type: 'int',
+    default: 0,
+    comment: '신고 수',
+  })
+  reportCount: number;
 }

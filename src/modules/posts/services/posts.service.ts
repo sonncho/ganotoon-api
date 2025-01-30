@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Post } from './entities/post.entity';
+import { Post } from '../entities/post.entity';
 import { Repository } from 'typeorm';
-import { PostType } from './entities/post-type.entity';
-import { CreatePostRequestDto, PostResponseDto } from './dtos/post.dto';
+import { PostType } from '../entities/post-type.entity';
+import { CreatePostRequestDto, PostResponseDto } from '../dtos/post.dto';
 import { BusinessException } from '@/common/exceptions';
 import { ErrorCode, SortOrder } from '@/common/constants';
-import { UsersService } from '../users/users.service';
-import { JwtPayload } from '../auth/types/tokens.type';
-import { FindPostsRequestDto, PostSortBy } from './dtos/find-posts.dto';
+import { UsersService } from '../../users/users.service';
+import { JwtPayload } from '../../auth/types/tokens.type';
+import { FindPostsRequestDto, PostSortBy } from '../dtos/find-posts.dto';
 import { PaginatedResponseDto } from '@/common/dtos';
 
 @Injectable()
@@ -77,19 +77,7 @@ export class PostsService {
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.author', 'author')
       .leftJoinAndSelect('post.postType', 'postType')
-      .leftJoin(
-        'post.postComments',
-        'postComment',
-        'postComment.isActive = :isActive',
-        {
-          isActive: true,
-        },
-      )
-      .addSelect('COUNT(DISTINCT postComment.id)', 'commentCount')
-      .where('post.isActive = :isActive', { isActive: true })
-      .groupBy('post.id')
-      .addGroupBy('author.id')
-      .addGroupBy('postType.id');
+      .where('post.isActive = :isActive', { isActive: true });
 
     // 게시물 타입 필터링
     if (params.type) {
@@ -123,16 +111,4 @@ export class PostsService {
       params.limit,
     );
   }
-
-  //* 게시글 댓글 조회
-  // findCommnetByPostId(postId: number) {
-  //   // 게시글 존재 여부 확인
-  //   // 댓글조회
-  // }
-
-  //* 게시글 댓글 생성
-
-  //* 게시글 댓글 삭제
-
-  //* 게시글 댓글 수정
 }

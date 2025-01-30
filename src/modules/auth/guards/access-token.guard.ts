@@ -8,7 +8,6 @@ import { ErrorCode } from '@/common/constants';
 export class AccessTokenGuard extends AuthGuard('jwt') {
   constructor(private tokenBlacklistService: TokenBlacklistService) {
     super();
-    console.log('TokenBlacklistService:', tokenBlacklistService);
   }
 
   private isOptional(context: ExecutionContext): boolean {

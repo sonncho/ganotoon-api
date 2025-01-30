@@ -94,7 +94,7 @@ export class PostResponseDto {
       title: post.title,
       content: post.content,
       viewCount: post.viewCount,
-      commentCount: post.postComments?.length || 0,
+      commentCount: post.commentCount,
       isOwner: userId ? post.authorId === userId : false, // 소유 여부 체크
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,

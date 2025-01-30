@@ -79,4 +79,14 @@ export const ErrorCode = {
       message: '해당 게시판에 글을 작성할 권한이 없습니다.',
     },
   },
+  COMMENT: {
+    PARENT_NOT_FOUND: {
+      code: 'COMMENT_PARENT_NOT_FOUND',
+      message: '부모 댓글을 찾을 수 없습니다',
+    },
+    NESTED_REPLY_NOT_ALLOWED: {
+      code: 'COMMENT_NESTED_REPLY_NOT_ALLOWED',
+      message: '대댓글에는 답글을 작성할 수 없습니다',
+    },
+  },
 } as const;
