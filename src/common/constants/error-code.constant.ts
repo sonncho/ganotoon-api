@@ -80,6 +80,14 @@ export const ErrorCode = {
     },
   },
   COMMENT: {
+    NOT_FOUND: {
+      code: 'COMMENT_NOT_FOUND',
+      message: '댓글을 찾을 수 없습니다',
+    },
+    NO_PERMISSION: {
+      code: 'COMMENT_NO_PERMISSION',
+      message: '댓글을 수정할 권한이 없습니다',
+    },
     PARENT_NOT_FOUND: {
       code: 'COMMENT_PARENT_NOT_FOUND',
       message: '부모 댓글을 찾을 수 없습니다',

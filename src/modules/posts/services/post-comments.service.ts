@@ -6,11 +6,15 @@ import { PostComment } from '../entities/post-comment.entity';
 import { UsersService } from '@/modules/users/users.service';
 import { JwtPayload } from '@/modules/auth/types/tokens.type';
 import {
+  CommentSortBy,
   CreatePostCommentRequestDto,
+  FindCommentsRequestDto,
   PostCommentResponseDto,
+  UpdatePostCommentRequestDto,
 } from '../dtos/post-comment.dto';
 import { ErrorCode } from '@/common/constants';
 import { BusinessException } from '@/common/exceptions';
+import { PaginatedResponseDto } from '@/common/dtos';
 
 @Injectable()
 export class PostCommentsService {
@@ -23,8 +27,25 @@ export class PostCommentsService {
   ) {}
 
   //* 댓글 조회
-  async findCommentsByPostId(postId: number, user?: JwtPayload) {
-    const comments = await this.commentRepository.find({
+  async findCommentsByPostId(
+    postId: number,
+    params: FindCommentsRequestDto,
+    user?: JwtPayload,
+  ) {
+    let orderBy: any = {};
+
+    switch (params.sortBy) {
+      case CommentSortBy.LIKES:
+        orderBy = { likes: { id: 'DESC' } };
+        break;
+
+      case CommentSortBy.LATEST:
+      default:
+        orderBy = { createdAt: 'DESC' };
+        break;
+    }
+
+    const [comments, total] = await this.commentRepository.findAndCount({
       where: {
         postId,
         isActive: true,
@@ -32,16 +53,20 @@ export class PostCommentsService {
       },
       relations: ['author', 'children', 'children.author', 'likes', 'reports'],
       order: {
-        createdAt: 'DESC',
+        ...orderBy,
         children: {
           createdAt: 'ASC',
         },
       },
+      skip: params.skip,
+      take: params.limit,
     });
 
-    return comments.map((comment) =>
+    const items = comments.map((comment) =>
       PostCommentResponseDto.from(comment, user?.sub),
     );
+
+    return PaginatedResponseDto.from(items, total, params.page, params.limit);
   }
 
   //* 댓글 작성
@@ -57,7 +82,6 @@ export class PostCommentsService {
       },
     });
 
-    console.log(createCommentDto);
     if (!post) throw new BusinessException(ErrorCode.POST.NOT_FOUND);
 
     const user = await this.usersService.findById(author.sub);
@@ -72,8 +96,6 @@ export class PostCommentsService {
           isActive: true,
         },
       });
-
-      console.log(parentComment);
 
       if (!parentComment)
         throw new BusinessException(ErrorCode.COMMENT.PARENT_NOT_FOUND);
@@ -97,8 +119,8 @@ export class PostCommentsService {
     await this.postRepository.update(
       { id: postId },
       {
-        commentCount: () => '"comment_count" + 1',
-        activeCommentCount: () => '"active_comment_count" + 1',
+        commentCount: () => '`comment_count` + 1',
+        activeCommentCount: () => '`active_comment_count` + 1',
       },
     );
 
@@ -112,5 +134,32 @@ export class PostCommentsService {
   async deleteComment() {}
 
   //* 댓글 수정
-  async updateComment() {}
+  async updateComment(
+    postId: number,
+    commentId: number,
+    updateCommentDto: UpdatePostCommentRequestDto,
+    user: JwtPayload,
+  ) {
+    const comment = await this.commentRepository.findOne({
+      where: {
+        id: commentId,
+        postId,
+        isActive: true,
+      },
+    });
+    if (!comment) throw new BusinessException(ErrorCode.COMMENT.NOT_FOUND);
+
+    // 작성자 본인 확인
+    if (comment.authorId !== user.sub) {
+      console.log(comment.authorId);
+      console.log(user.sub);
+      throw new BusinessException(ErrorCode.COMMENT.NO_PERMISSION);
+    }
+
+    // 댓글 수정
+    Object.assign(comment, updateCommentDto);
+    const updatedComment = await this.commentRepository.save(comment);
+
+    return PostCommentResponseDto.from(updatedComment, user.sub);
+  }
 }

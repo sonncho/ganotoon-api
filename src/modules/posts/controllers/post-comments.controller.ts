@@ -6,6 +6,8 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
+  Query,
 } from '@nestjs/common';
 import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { PostCommentsService } from '../services/post-comments.service';
@@ -14,7 +16,12 @@ import { ApiDocs } from '@/common/decorators';
 import { GetUser } from '@/modules/auth/decorators/get-user.decorator';
 import { JwtPayload } from '@/modules/auth/types/tokens.type';
 import { Auth } from '@/modules/auth/decorators/auth.decorator';
-import { CreatePostCommentRequestDto } from '../dtos/post-comment.dto';
+import {
+  CreatePostCommentRequestDto,
+  FindCommentsRequestDto,
+  PostCommentResponseDto,
+  UpdatePostCommentRequestDto,
+} from '../dtos/post-comment.dto';
 
 @Controller('posts/:postId/comments')
 @ApiParam({ name: 'postId', description: '게시글 ID' })
@@ -44,8 +51,29 @@ export class PostCommentsController {
   @Get()
   async findAll(
     @Param('postId', ParseIntPipe) postId: number,
+    @Query() params: FindCommentsRequestDto,
     @GetUser() user?: JwtPayload,
   ) {
-    return this.commentsService.findCommentsByPostId(postId, user);
+    return this.commentsService.findCommentsByPostId(postId, params, user);
+  }
+
+  @Auth()
+  @Put(':commentId')
+  @ApiDocs({
+    summary: '댓글 수정',
+    errorCodes: ['COMMENT.NOT_FOUND', 'COMMENT.NO_PERMISSION'],
+  })
+  async update(
+    @Param('postId', ParseIntPipe) postId: number,
+    @Param('commentId', ParseIntPipe) commentId: number,
+    @Body() updateCommentDto: UpdatePostCommentRequestDto,
+    @GetUser() user: JwtPayload,
+  ): Promise<PostCommentResponseDto> {
+    return this.commentsService.updateComment(
+      postId,
+      commentId,
+      updateCommentDto,
+      user,
+    );
   }
 }

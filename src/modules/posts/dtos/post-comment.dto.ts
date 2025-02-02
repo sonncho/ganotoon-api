@@ -10,9 +10,8 @@ import {
 import { PostComment } from '../entities/post-comment.entity';
 
 export enum CommentSortBy {
-  LATEST = 'latest',
-  LIKES = 'likes',
-  REPLIES = 'replies',
+  LATEST = 'LATEST',
+  LIKES = 'LIKES',
 }
 
 export class FindCommentsRequestDto extends PaginationRequestDto {
@@ -20,6 +19,7 @@ export class FindCommentsRequestDto extends PaginationRequestDto {
     enum: CommentSortBy,
     description: '정렬 기준',
     required: false,
+    default: 'LATEST',
   })
   @IsEnum(CommentSortBy)
   @IsOptional()
@@ -142,4 +142,14 @@ export class PostCommentResponseDto {
       ),
     };
   }
+}
+
+export class UpdatePostCommentRequestDto {
+  @ApiProperty({
+    description: '댓글 내용',
+    example: '수정된 댓글 내용입니다',
+  })
+  @IsString()
+  @MinLength(1)
+  content: string;
 }

@@ -4,6 +4,14 @@ import { TokenBlacklistService } from '../services/token-blacklist.service';
 import { BusinessException } from '@/common/exceptions/business.exception';
 import { ErrorCode } from '@/common/constants';
 
+/**
+ * Access Token 인증을 처리하는 가드입니다.
+ * 1. 토큰의 존재 여부 확인
+ * 2. 토큰의 만료 여부 확인
+ * 3. 블랙리스트 체크
+ * 4. 토큰 서명 검증
+ * 의 과정을 수행합니다.
+ */
 @Injectable()
 export class AccessTokenGuard extends AuthGuard('jwt') {
   constructor(private tokenBlacklistService: TokenBlacklistService) {
@@ -27,6 +35,7 @@ export class AccessTokenGuard extends AuthGuard('jwt') {
     }
 
     try {
+      // Passport 전략을 통한 기본 검증
       const isValid = await super.canActivate(context);
       if (!isValid) throw new BusinessException(ErrorCode.AUTH.INVALID_TOKEN);
 
@@ -34,23 +43,25 @@ export class AccessTokenGuard extends AuthGuard('jwt') {
 
       // Bearer 토큰 형식 체크
       const [type, token] = authHeader.split(' ');
-      if (type !== 'Bearer' || !token)
+      if (type !== 'Bearer' || !token) {
         throw new BusinessException(ErrorCode.AUTH.INVALID_TOKEN);
+      }
 
       // 블랙리스트 체크
-      if (await this.tokenBlacklistService.isBlacklisted(token))
+      if (await this.tokenBlacklistService.isBlacklisted(token)) {
         throw new BusinessException(ErrorCode.AUTH.TOKEN_BLACKLISTED);
+      }
 
       return true;
     } catch (error) {
-      // 선택적 인증이고 토큰이 유효하지 않은 경우
       if (isOptional) {
         return true;
       }
 
-      // JWT 전략에서 발생하는 에러 처리
       if (error.name === 'TokenExpiredError')
         throw new BusinessException(ErrorCode.AUTH.TOKEN_EXPIRED);
+
+      if (error instanceof BusinessException) throw error;
 
       throw new BusinessException(ErrorCode.AUTH.INVALID_TOKEN);
     }
@@ -64,12 +75,10 @@ export class AccessTokenGuard extends AuthGuard('jwt') {
   ): TUser {
     const isOptional = this.isOptional(context);
 
-    // 에러가 있고 선택적이지 않은 경우에만 에러 throw
-    if (err && !isOptional) {
-      throw err;
+    if (err || (!user && !isOptional)) {
+      throw new BusinessException(ErrorCode.AUTH.INVALID_TOKEN);
     }
 
-    // 선택적 인증인 경우 user가 없어도 undefined 반환
     return user;
   }
 }

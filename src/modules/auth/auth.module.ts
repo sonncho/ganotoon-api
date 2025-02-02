@@ -7,6 +7,7 @@ import { AccessTokenStrategy, RefreshTokenStrategy } from './strategies';
 import { CommonModule } from '../common/common.module';
 import { TokenBlacklistService } from './services/token-blacklist.service';
 import { VerificationService } from './services/verification.service';
+import { AccessTokenGuard } from './guards/access-token.guard';
 
 @Module({
   imports: [
@@ -21,7 +22,13 @@ import { VerificationService } from './services/verification.service';
     RefreshTokenStrategy,
     TokenBlacklistService,
     VerificationService,
+    AccessTokenGuard,
   ],
-  exports: [AuthService, VerificationService, TokenBlacklistService],
+  exports: [
+    AuthService,
+    VerificationService,
+    TokenBlacklistService,
+    AccessTokenGuard,
+  ],
 })
 export class AuthModule {}

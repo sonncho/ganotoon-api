@@ -28,12 +28,6 @@ export class UserResponseDto {
   gender: string;
 
   @ApiProperty({
-    example: false,
-    description: '이메일 인증 여부',
-  })
-  isEmailVerified: boolean;
-
-  @ApiProperty({
     example: '1990-01-01',
     description: '생년월일',
   })
